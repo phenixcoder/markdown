@@ -3,20 +3,28 @@ import hljs from 'highlight.js'
 import DOMPurify from 'isomorphic-dompurify'
 
 // Configure marked with GitHub Flavored Markdown
-marked.setOptions({
+marked.use({
   gfm: true,
   breaks: true,
-  highlight: (code: string, lang: string) => {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(code, { language: lang }).value
-      } catch (err) {
-        console.error('Highlight error:', err)
-      }
-    }
-    return hljs.highlightAuto(code).value
-  },
 })
+
+// Custom renderer for code blocks with syntax highlighting
+const renderer = new marked.Renderer()
+
+renderer.code = function(code: string, language: string | undefined) {
+  if (language && hljs.getLanguage(language)) {
+    try {
+      const highlighted = hljs.highlight(code, { language }).value
+      return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`
+    } catch (err) {
+      console.error('Highlight error:', err)
+    }
+  }
+  const highlighted = hljs.highlightAuto(code).value
+  return `<pre><code class="hljs">${highlighted}</code></pre>`
+}
+
+marked.use({ renderer })
 
 export function parseMarkdown(markdown: string): string {
   const html = marked.parse(markdown) as string
