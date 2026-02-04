@@ -21,10 +21,9 @@ mac:
 
 win:
   target:
-    - nsis
     - portable
   icon: build/icon.png
-  artifactName: ${productName}-Setup-${version}.${ext}
+  artifactName: ${productName}-${version}.${ext}
 
 linux:
   category: Utility
