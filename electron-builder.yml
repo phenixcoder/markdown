@@ -1,0 +1,58 @@
+appId: com.phenixcoder.markdown-viewer
+productName: Markdown Viewer
+copyright: Copyright © 2024 Balwant Singh
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist
+  - dist-electron
+  - package.json
+
+mac:
+  category: public.app-category.productivity
+  target:
+    - dmg
+    - zip
+  icon: build/icon.icns
+  artifactName: ${productName}-${version}.${ext}
+
+win:
+  target:
+    - nsis
+    - portable
+  icon: build/icon.ico
+  artifactName: ${productName}-Setup-${version}.${ext}
+
+linux:
+  category: Utility
+  target:
+    - AppImage
+    - deb
+    - rpm
+  icon: build/icon.png
+  artifactName: ${productName}-${version}.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: true
+
+fileAssociations:
+  - ext: md
+    name: Markdown Document
+    description: Markdown Document
+    role: Editor
+    icon: build/markdown-icon.ico
+  - ext: markdown
+    name: Markdown Document
+    description: Markdown Document
+    role: Editor
+    icon: build/markdown-icon.ico
+
+publish:
+  provider: github
+  owner: phenixcoder
+  repo: markdown

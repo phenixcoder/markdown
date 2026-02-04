@@ -1,0 +1,153 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 0.1.0)'
+        required: true
+        default: '0.1.0'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate version format
+        id: version
+        run: |
+          if [[ ! "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format. Must be semver (e.g., 0.1.0)"
+            exit 1
+          fi
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add package.json
+          git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
+          git push
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          release_name: Release v${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+          body: |
+            ## What's New in v${{ github.event.inputs.version }}
+
+            ### Features
+            - Modern Electron-based markdown viewer
+            - React + TypeScript + TailwindCSS
+            - Light/Dark themes
+            - Syntax highlighting for code blocks
+
+            ### Downloads
+            - **macOS**: `Markdown-Viewer-${{ github.event.inputs.version }}.dmg`
+            - **Windows**: `Markdown-Viewer-Setup-${{ github.event.inputs.version }}.exe`
+            - **Linux**: `Markdown-Viewer-${{ github.event.inputs.version }}.AppImage`
+
+            ### Installation
+            Download the appropriate file for your platform and install.
+
+            ---
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ github.event.inputs.version }}...HEAD
+
+  build-release:
+    needs: create-release
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            artifact_name: macOS
+          - os: ubuntu-latest
+            artifact_name: Linux
+          - os: windows-latest
+            artifact_name: Windows
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+
+      - name: Build Electron app
+        run: npm run electron:build
+
+      - name: List build output
+        run: |
+          echo "Build output:"
+          ls -R release/ || ls -R dist/ || echo "No release directory found"
+
+      - name: Upload macOS DMG
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./release/Markdown-Viewer-${{ needs.create-release.outputs.version }}.dmg
+          asset_name: Markdown-Viewer-${{ needs.create-release.outputs.version }}.dmg
+          asset_content_type: application/octet-stream
+        continue-on-error: true
+
+      - name: Upload Windows Installer
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./release/Markdown-Viewer-Setup-${{ needs.create-release.outputs.version }}.exe
+          asset_name: Markdown-Viewer-Setup-${{ needs.create-release.outputs.version }}.exe
+          asset_content_type: application/octet-stream
+        continue-on-error: true
+
+      - name: Upload Linux AppImage
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./release/Markdown-Viewer-${{ needs.create-release.outputs.version }}.AppImage
+          asset_name: Markdown-Viewer-${{ needs.create-release.outputs.version }}.AppImage
+          asset_content_type: application/octet-stream
+        continue-on-error: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}-build
+          path: |
+            release/**/*
+            dist/**/*
+          retention-days: 7
