@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Modern Electron-based markdown viewer with React and TypeScript",
   "main": "dist-electron/main.js",
+  "type": "module",
   "author": "Balwant Singh <phenixcoder@gmail.com>",
   "license": "MIT",
   "repository": {
