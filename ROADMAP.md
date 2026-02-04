@@ -13,6 +13,7 @@
 This roadmap outlines the complete rebuild of the markdown viewer from a legacy Electron v13 app to a modern, secure, feature-rich desktop application with automated CI/CD and multi-platform distribution.
 
 ### **Tech Stack**
+
 - **Frontend:** React 18 + TypeScript + TailwindCSS
 - **Desktop:** Electron 32 + Vite 5
 - **Markdown:** marked 12 + highlight.js 11
@@ -23,15 +24,17 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 
 ---
 
-## ✅ Completed Work (Session: Feb 4, 2026)
+## ✅ Completed Work (Sessions: Feb 4-5, 2026)
 
 ### **Phase 0: Preparation** ✅ COMPLETED
+
 - [x] Analyze legacy codebase
 - [x] Create comprehensive roadmap
 - [x] Move legacy code to `legacy` branch
 - [x] Clean workspace for fresh start
 
 ### **Phase 1: Foundation Setup** ✅ COMPLETED
+
 **Version:** 0.1.0-alpha.1
 
 - [x] Initialize Vite + Electron + React + TypeScript project
@@ -46,6 +49,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [x] Set up proper project folder structure
 
 **Files Created:**
+
 - `src/main/index.ts` - Electron main process
 - `src/main/preload.ts` - IPC bridge with context isolation
 - `src/types/electron.d.ts` - TypeScript definitions
@@ -53,6 +57,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - `tsconfig.json` - TypeScript configuration
 
 ### **Phase 2: Core Markdown Rendering** ✅ COMPLETED
+
 **Version:** 0.1.0-alpha.2
 
 - [x] Install and configure `marked` library (v12)
@@ -66,6 +71,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [x] Handle markdown parsing errors gracefully
 
 **Files Created:**
+
 - `src/renderer/utils/markdown.ts` - Markdown parser with highlighting
 - `src/renderer/components/MarkdownViewer.tsx` - Main viewer component
 - `src/renderer/App.tsx` - Application shell
@@ -73,6 +79,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - `src/renderer/styles/index.css` - Global styles with dark mode
 
 ### **Phase 3: File Operations** ✅ COMPLETED (Basic)
+
 - [x] Implement file opening via dialog
 - [x] Command-line argument parsing for file paths
 - [x] IPC handlers for file reading
@@ -80,11 +87,15 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [x] Error handling for file operations
 
 **Features Working:**
-- Open markdown files via "Open File" button
+
+- Open markdown files via File menu (Cmd/Ctrl+O)
 - Command-line usage: `./markdown-viewer file.md`
 - Auto-load file from command-line on startup
+- Multi-window open: new window when current has a document
+- File info modal (metadata + front matter)
 
 ### **CI/CD & Build Infrastructure** ✅ COMPLETED
+
 - [x] Set up GitHub Actions workflows
 - [x] Multi-platform CI (macOS, Windows, Linux)
 - [x] Automated linting and tests on push/PR
@@ -96,24 +107,28 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [x] Added application icon (markdown design)
 
 **Build Outputs:**
+
 - **Windows:** Portable EXE (no installer)
 - **macOS:** DMG and ZIP
 - **Linux:** AppImage, DEB
 
 **Files Created:**
+
 - `.github/workflows/build.yml` - CI on push/PR
 - `.github/workflows/release.yml` - Manual release workflow
 - `electron-builder.yml` - Packaging configuration
 - `build/icon.png` - Application icon
 
 ### **Documentation** ✅ COMPLETED
+
 - [x] Comprehensive README.md
 - [x] WSL2-GUIDE.md for running in WSL2
 - [x] Helper scripts (markdown-viewer.sh, markdown-viewer.bat)
 - [x] Testing infrastructure setup
 
 **Current Status:**
-- ✅ All CI builds passing
+
+- ⚠️ CI status depends on lockfile sync
 - ✅ Application works on Windows 11
 - ✅ Artifacts available for download
 - ✅ Latest build: https://github.com/phenixcoder/markdown/actions/runs/21657079553
@@ -123,6 +138,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ## 🎯 Next Development Phases
 
 ### **Phase 3: File Operations** (PARTIAL - Continue Here)
+
 - [ ] Configure TypeScript (3 configs: main, renderer, node)
 - [ ] Set up ESLint + Prettier with recommended configs
 - [ ] Configure TailwindCSS with custom theme
@@ -133,6 +149,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Set up project folder structure
 
 #### Dependencies to Install
+
 ```json
 {
   "electron": "^40.1.0",
@@ -145,6 +162,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ```
 
 #### Deliverables
+
 - Working Electron app with React renderer
 - TypeScript compilation working
 - Hot module replacement functional
@@ -153,11 +171,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ---
 
 ### **Phase 2: Core Markdown Rendering** 📝
+
 **Version:** 0.1.0-alpha.2  
 **Timeline:** 2 hours  
 **Priority:** HIGH
 
 #### Tasks
+
 - [ ] Install and configure `marked` library
 - [ ] Enable GitHub Flavored Markdown (GFM)
 - [ ] Integrate `highlight.js` for syntax highlighting
@@ -172,6 +192,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Handle markdown parsing errors gracefully
 
 #### Dependencies to Install
+
 ```json
 {
   "marked": "^12.0.0",
@@ -183,6 +204,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ```
 
 #### Deliverables
+
 - Functional markdown preview component
 - Light and dark themes working
 - Syntax highlighting for code blocks
@@ -191,20 +213,26 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ---
 
 ### **Phase 3: File Operations** (PARTIAL - Continue Here)
+
 **Version:** 0.1.0-beta.1  
 **Timeline:** 3 hours remaining  
 **Priority:** HIGH
 
 #### ✅ Completed Tasks
+
 - [x] Implement file opening via dialog
 - [x] Command-line argument parsing for file paths
 - [x] IPC handlers for file reading
 - [x] Handle `open-file` event (macOS)
 - [x] Parse command-line arguments on startup
 - [x] Support multiple file formats (.md, .markdown, .txt)
+- [x] Add File menu with Open/Close
+- [x] Add file info modal (metadata + front matter)
+- [x] Add About modal and app metadata
+- [x] Configure file associations in electron-builder
 
 #### 🔲 Remaining Tasks
-- [ ] Configure file associations in electron-builder
+
 - [ ] Test double-click file opening on all platforms
 - [ ] Implement recent files list (using electron-store)
 - [ ] Add drag & drop file support
@@ -214,10 +242,12 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Implement file save functionality (if editing enabled)
 
 #### Configuration Files
-- `electron-builder.yml` - File association config (partial)
+
+- `electron-builder.yml` - File association config (updated)
 - `build/entitlements.mac.plist` - macOS permissions (needed)
 
 #### Next Steps
+
 1. Test file associations by installing the app
 2. Add recent files menu
 3. Implement file watching for live reload
@@ -225,11 +255,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ---
 
 ### **Phase 4: Source View Mode** 👁️
+
 **Version:** 0.1.0-alpha.3  
 **Timeline:** 3 hours  
 **Priority:** HIGH
 
 #### Tasks
+
 - [ ] Configure electron-builder file associations
 - [ ] Implement protocol handler for custom URLs
 - [ ] Handle `open-file` event (macOS)
@@ -244,11 +276,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Show error dialog for unreadable files
 
 #### Configuration Files
+
 - `electron-builder.yml` - File association config
 - `build/entitlements.mac.plist` - macOS permissions
 - Platform-specific build scripts
 
 #### Deliverables
+
 - .md files open with app on double-click
 - Command-line file opening works (`markdown-viewer file.md`)
 - File association works on all platforms
@@ -256,11 +290,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ---
 
 ### **Phase 4: Source View Mode** 👁️
+
 **Version:** 0.1.0-alpha.4  
 **Timeline:** 2 hours  
 **Priority:** MEDIUM
 
 #### Tasks
+
 - [ ] Create SourceViewer component
 - [ ] Add syntax highlighting for raw markdown
 - [ ] Implement view mode state management
@@ -275,11 +311,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Add line numbers to source view
 
 #### Components to Build
+
 - `SourceViewer.tsx` - Raw markdown display
 - `SplitView.tsx` - Split pane layout
 - `ViewModeToggle.tsx` - Mode switcher
 
 #### Deliverables
+
 - Three view modes: Preview, Source, Split
 - Smooth transitions between modes
 - Scroll sync in split mode
@@ -288,11 +326,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ---
 
 ### **Phase 5: Edit Mode** ✏️
+
 **Version:** 0.1.0-beta.1  
 **Timeline:** 3 hours  
 **Priority:** MEDIUM
 
 #### Tasks
+
 - [ ] Install and configure CodeMirror 6
 - [ ] Add markdown language support
 - [ ] Configure editor extensions (autocomplete, keybindings)
@@ -301,7 +341,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Add character/word count display
 - [ ] Implement save file handler (IPC)
 - [ ] Add "Save As" dialog
-- [ ] Show unsaved changes indicator (*)
+- [ ] Show unsaved changes indicator (\*)
 - [ ] Warn on close with unsaved changes
 - [ ] Implement auto-save with configurable interval
 - [ ] Integrate chokidar for file watching
@@ -309,6 +349,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Handle file deletion/rename gracefully
 
 #### Dependencies to Install
+
 ```json
 {
   "@codemirror/view": "^6.0.0",
@@ -320,6 +361,7 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ```
 
 #### Deliverables
+
 - Fully functional markdown editor
 - Live preview while typing
 - Save/Save As working
@@ -329,11 +371,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ---
 
 ### **Phase 6: File Operations** 📂
+
 **Version:** 0.1.0-beta.2  
 **Timeline:** 2 hours  
 **Priority:** MEDIUM
 
 #### Tasks
+
 - [ ] Implement "Open File" dialog
 - [ ] Filter by .md, .markdown, .txt extensions
 - [ ] Remember last opened directory
@@ -350,11 +394,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Make toolbar responsive
 
 #### Components to Build
+
 - `Toolbar.tsx` - Top toolbar
 - `RecentFiles.tsx` - Recent files menu
 - `FileDropZone.tsx` - Drag-and-drop area
 
 #### Deliverables
+
 - File open dialog working
 - Drag-and-drop functional
 - Recent files persisted and accessible
@@ -363,11 +409,13 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 ---
 
 ### **Phase 7: Settings & Preferences** ⚙️
+
 **Version:** 0.1.0-beta.3  
 **Timeline:** 1 hour  
 **Priority:** MEDIUM
 
 #### Tasks
+
 - [ ] Define settings schema (TypeScript interface)
 - [ ] Implement settings context/provider
 - [ ] Create Settings modal component
@@ -385,21 +433,23 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 - [ ] Persist settings with electron-store
 
 #### Settings to Include
+
 ```typescript
 interface Settings {
-  theme: 'light' | 'dark' | 'auto';
-  defaultViewMode: 'preview' | 'source' | 'split';
-  autoSaveInterval: number; // seconds, 0 = disabled
-  editorFontFamily: string;
-  editorFontSize: number;
-  customCSS: string;
-  lineWrapping: boolean;
-  showLineNumbers: boolean;
-  syntaxTheme: string;
+  theme: 'light' | 'dark' | 'auto'
+  defaultViewMode: 'preview' | 'source' | 'split'
+  autoSaveInterval: number // seconds, 0 = disabled
+  editorFontFamily: string
+  editorFontSize: number
+  customCSS: string
+  lineWrapping: boolean
+  showLineNumbers: boolean
+  syntaxTheme: string
 }
 ```
 
 #### Deliverables
+
 - Settings modal accessible (Ctrl+,)
 - All settings persist between sessions
 - Settings apply immediately on change
@@ -407,11 +457,13 @@ interface Settings {
 ---
 
 ### **Phase 8: Testing Infrastructure** 🧪
+
 **Version:** 0.1.0-rc.1  
 **Timeline:** 2 hours  
 **Priority:** HIGH
 
 #### Tasks
+
 - [ ] Configure Vitest for unit tests
 - [ ] Configure Playwright for E2E tests
 - [ ] Create test utilities and helpers
@@ -430,6 +482,7 @@ interface Settings {
 - [ ] Achieve >80% code coverage
 
 #### Dependencies to Install
+
 ```json
 {
   "vitest": "^1.2.2",
@@ -442,6 +495,7 @@ interface Settings {
 ```
 
 #### Test Files to Create
+
 - `tests/unit/markdown.test.ts`
 - `tests/unit/file-handler.test.ts`
 - `tests/unit/theme.test.ts`
@@ -450,6 +504,7 @@ interface Settings {
 - `tests/e2e/view-modes.spec.ts`
 
 #### Deliverables
+
 - Full unit test suite passing
 - E2E tests covering critical workflows
 - Coverage report >80%
@@ -458,11 +513,13 @@ interface Settings {
 ---
 
 ### **Phase 9: Polish & UX** 🎨
+
 **Version:** 0.1.0-rc.2  
 **Timeline:** 2 hours  
 **Priority:** MEDIUM
 
 #### Tasks
+
 - [ ] Add React error boundaries
 - [ ] Handle file read/write errors gracefully
 - [ ] Show user-friendly error messages
@@ -481,11 +538,13 @@ interface Settings {
 - [ ] Lazy load heavy components
 
 #### Components to Build
+
 - `ErrorBoundary.tsx` - React error handler
 - `Loading.tsx` - Loading states
 - `KeyboardHelp.tsx` - Shortcuts modal
 
 #### Keyboard Shortcuts
+
 - `Ctrl/Cmd + O` - Open file
 - `Ctrl/Cmd + S` - Save file
 - `Ctrl/Cmd + Shift + S` - Toggle source view
@@ -496,6 +555,7 @@ interface Settings {
 - `Ctrl/Cmd + R` - Reload file
 
 #### Deliverables
+
 - Polished error handling
 - Smooth loading states
 - Comprehensive keyboard shortcuts
@@ -504,11 +564,13 @@ interface Settings {
 ---
 
 ### **Phase 10: GitHub Actions CI/CD** 🚀
+
 **Version:** 0.1.0  
 **Timeline:** 2 hours  
 **Priority:** HIGH
 
 #### Tasks
+
 - [ ] Create `.github/workflows/build.yml`
 - [ ] Create `.github/workflows/release.yml`
 - [ ] Set up matrix for macOS/Windows/Linux builds
@@ -529,6 +591,7 @@ interface Settings {
 - [ ] Tag release with version (v0.1.0)
 
 #### Workflow Files
+
 ```
 .github/
 ├── workflows/
@@ -538,10 +601,12 @@ interface Settings {
 ```
 
 #### GitHub Secrets Required
+
 - `GITHUB_TOKEN` (auto-provided)
 - (Optional) Code signing certificates
 
 #### Deliverables
+
 - CI runs on every push
 - Manual release workflow functional
 - Binaries for macOS/Windows/Linux
@@ -550,11 +615,13 @@ interface Settings {
 ---
 
 ### **Phase 11: Packaging & Distribution** 📦
+
 **Version:** 0.1.0  
 **Timeline:** 1 hour  
 **Priority:** HIGH
 
 #### Tasks
+
 - [ ] Create `electron-builder.yml`
 - [ ] Configure app metadata (name, ID, description)
 - [ ] Set up file associations in config
@@ -572,11 +639,13 @@ interface Settings {
 - [ ] Create installation instructions
 
 #### Build Targets
+
 - **macOS:** DMG, zip (universal or separate Intel/Apple Silicon)
 - **Windows:** NSIS installer, portable exe
 - **Linux:** AppImage, deb, rpm
 
 #### Deliverables
+
 - electron-builder configuration complete
 - Builds successful on all platforms
 - Installers tested and working
@@ -585,11 +654,13 @@ interface Settings {
 ---
 
 ### **Phase 12: Documentation** 📚
+
 **Version:** 0.1.0  
 **Timeline:** 1 hour  
 **Priority:** MEDIUM
 
 #### Tasks
+
 - [ ] Write comprehensive README.md
 - [ ] Add project description and features
 - [ ] Include screenshots/demo GIF
@@ -610,6 +681,7 @@ interface Settings {
 - [ ] Update package.json metadata
 
 #### Documentation Files
+
 - `README.md` - User-facing documentation
 - `AGENTS.md` - AI assistant guidelines
 - `CHANGELOG.md` - Version history
@@ -617,6 +689,7 @@ interface Settings {
 - `LICENSE` - MIT License
 
 #### Deliverables
+
 - Complete, professional documentation
 - Easy onboarding for new users/contributors
 - Clear build and development instructions
@@ -626,10 +699,12 @@ interface Settings {
 ## 🎯 Version Milestones
 
 ### **v0.1.0 - MVP Release** (Current Target)
+
 **Target Date:** TBD  
 **Focus:** Core functionality + CI/CD
 
 **Features:**
+
 - ✅ Markdown rendering with syntax highlighting
 - ✅ Light/Dark themes
 - ✅ File association (.md files)
@@ -642,6 +717,7 @@ interface Settings {
 - ✅ Unit and E2E tests
 
 **Excluded (deferred to v0.2.0+):**
+
 - ❌ Multi-tab support
 - ❌ Auto-update functionality
 - ❌ Export to PDF/HTML
@@ -651,10 +727,12 @@ interface Settings {
 ---
 
 ### **v0.2.0 - Enhanced Features**
+
 **Target Date:** TBD  
 **Focus:** User experience improvements
 
 **Planned Features:**
+
 - Multi-tab support (open multiple files)
 - Export to PDF/HTML
 - Custom markdown templates
@@ -668,10 +746,12 @@ interface Settings {
 ---
 
 ### **v0.3.0 - Advanced Features**
+
 **Target Date:** TBD  
 **Focus:** Advanced functionality
 
 **Planned Features:**
+
 - Auto-update with electron-updater
 - Plugin/extension system
 - Cloud sync integration (optional)
@@ -685,10 +765,12 @@ interface Settings {
 ---
 
 ### **v1.0.0 - Production Release**
+
 **Target Date:** TBD  
 **Focus:** Stability + Polish
 
 **Requirements:**
+
 - Code signing for all platforms
 - Comprehensive documentation
 - 90%+ test coverage
@@ -704,11 +786,13 @@ interface Settings {
 ## 📊 Progress Tracking
 
 ### **Current Status**
+
 - **Phase:** 0 (Preparation)
 - **Version:** 0.0.0
 - **Progress:** 0% (0/12 phases complete)
 
 ### **Completion Checklist**
+
 - [ ] Phase 0: Preparation
 - [ ] Phase 1: Foundation Setup
 - [ ] Phase 2: Core Markdown Rendering
@@ -730,6 +814,7 @@ interface Settings {
 ### **Architecture Choices**
 
 #### **Why Vite over Webpack?**
+
 - 10-100x faster HMR during development
 - Simpler configuration
 - Native ESM support
@@ -737,12 +822,14 @@ interface Settings {
 - Smaller bundle sizes
 
 #### **Why React over Vue/Svelte?**
+
 - Larger ecosystem and community
 - Better TypeScript integration
 - More component libraries available
 - Developer familiarity
 
 #### **Why `marked` over `showdown`?**
+
 - 3x faster parsing
 - Actively maintained
 - Smaller bundle size
@@ -750,6 +837,7 @@ interface Settings {
 - More extensible
 
 #### **Why CodeMirror 6 over Monaco?**
+
 - Lighter weight (~100KB vs ~3MB)
 - Better Electron integration
 - Modern architecture
@@ -759,12 +847,14 @@ interface Settings {
 ### **Security Improvements**
 
 **Legacy Issues (v13):**
+
 - ❌ `nodeIntegration: true` (security risk)
 - ❌ No context isolation
 - ❌ Direct DOM manipulation
 - ❌ No input sanitization
 
 **Modern Security (v40):**
+
 - ✅ `contextIsolation: true`
 - ✅ `nodeIntegration: false`
 - ✅ Preload script with explicit IPC channels
@@ -777,12 +867,14 @@ interface Settings {
 ## 📝 Notes & Considerations
 
 ### **Development Environment**
+
 - Node.js 20+ required
 - npm or yarn package manager
 - Git for version control
 - macOS/Windows/Linux for platform testing
 
 ### **Known Limitations (v0.1.0)**
+
 - Single file mode only (no tabs)
 - No auto-update (manual downloads)
 - No code signing (unsigned binaries)
@@ -791,6 +883,7 @@ interface Settings {
 - English UI only (no i18n)
 
 ### **Future Considerations**
+
 - Electron Forge migration (alternative to electron-builder)
 - Tauri port (smaller binary sizes)
 - Web version (PWA)
@@ -804,12 +897,14 @@ interface Settings {
 This roadmap is a living document. Suggestions and contributions are welcome!
 
 ### **How to Suggest Changes**
+
 1. Open an issue with the `roadmap` label
 2. Describe the proposed change
 3. Explain the rationale
 4. Wait for maintainer review
 
 ### **Priority Levels**
+
 - **HIGH:** Critical for MVP, blocking other work
 - **MEDIUM:** Important but not blocking
 - **LOW:** Nice to have, future enhancement
