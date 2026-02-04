@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { IpcRendererEvent } from 'electron'
 import MarkdownViewer from './components/MarkdownViewer'
 import { FileText, FolderOpen } from 'lucide-react'
 import './styles/markdown.css'
@@ -11,12 +12,17 @@ function App() {
 
   // Handle initial file opening from command line
   useEffect(() => {
-    window.electronAPI.on('open-initial-file', async (initialFilePath: string) => {
-      await loadFile(initialFilePath)
-    })
+    const handler = async (_event: IpcRendererEvent, ...args: unknown[]) => {
+      const initialFilePath = args[0]
+      if (typeof initialFilePath === 'string') {
+        await loadFile(initialFilePath)
+      }
+    }
+    
+    window.electronAPI.on('open-initial-file', handler)
 
     return () => {
-      window.electronAPI.off('open-initial-file', () => {})
+      window.electronAPI.off('open-initial-file', handler)
     }
   }, [])
 
