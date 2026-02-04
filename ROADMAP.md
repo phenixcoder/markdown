@@ -3,7 +3,7 @@
 > Modern Electron-based markdown viewer with React, TypeScript, and TailwindCSS
 
 **Repository:** https://github.com/phenixcoder/markdown  
-**Starting Version:** 0.1.0  
+**Current Version:** 0.1.0  
 **Target Platform:** macOS, Windows, Linux
 
 ---
@@ -14,40 +14,115 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 
 ### **Tech Stack**
 - **Frontend:** React 18 + TypeScript + TailwindCSS
-- **Desktop:** Electron 40 + Vite
-- **Markdown:** marked + highlight.js
-- **Editor:** CodeMirror 6
+- **Desktop:** Electron 32 + Vite 5
+- **Markdown:** marked 12 + highlight.js 11
+- **Editor:** CodeMirror 6 (planned)
 - **Testing:** Vitest (unit) + Playwright (E2E)
 - **CI/CD:** GitHub Actions
 - **Packaging:** electron-builder
 
 ---
 
-## 🎯 Development Phases
+## ✅ Completed Work (Session: Feb 4, 2026)
 
-### **Phase 0: Preparation** ✅
-**Status:** Ready to start  
-**Timeline:** 0.5 hours
-
+### **Phase 0: Preparation** ✅ COMPLETED
 - [x] Analyze legacy codebase
 - [x] Create comprehensive roadmap
-- [ ] Move legacy code to separate branch
-- [ ] Clean workspace for fresh start
+- [x] Move legacy code to `legacy` branch
+- [x] Clean workspace for fresh start
 
-**Deliverables:**
-- ROADMAP.md (this file)
-- Clean repository structure
+### **Phase 1: Foundation Setup** ✅ COMPLETED
+**Version:** 0.1.0-alpha.1
+
+- [x] Initialize Vite + Electron + React + TypeScript project
+- [x] Install core dependencies (React 18, Electron 32, marked, etc.)
+- [x] Configure TypeScript with proper tsconfig setup
+- [x] Set up ESLint + Prettier with strict rules
+- [x] Configure TailwindCSS 3 with dark mode support
+- [x] Create Electron window with security settings (context isolation, no node integration)
+- [x] Set up preload script with context bridge
+- [x] Configure IPC communication channels (file reading, file dialog)
+- [x] Create React renderer with Vite dev server
+- [x] Set up proper project folder structure
+
+**Files Created:**
+- `src/main/index.ts` - Electron main process
+- `src/main/preload.ts` - IPC bridge with context isolation
+- `src/types/electron.d.ts` - TypeScript definitions
+- `vite.config.ts` - Build configuration
+- `tsconfig.json` - TypeScript configuration
+
+### **Phase 2: Core Markdown Rendering** ✅ COMPLETED
+**Version:** 0.1.0-alpha.2
+
+- [x] Install and configure `marked` library (v12)
+- [x] Enable GitHub Flavored Markdown (GFM)
+- [x] Integrate `highlight.js` for syntax highlighting
+- [x] Add DOMPurify for XSS protection
+- [x] Create MarkdownViewer component
+- [x] Design GitHub-like markdown styles (CSS)
+- [x] Implement dark mode support (auto system preference)
+- [x] Style code blocks with syntax highlighting
+- [x] Handle markdown parsing errors gracefully
+
+**Files Created:**
+- `src/renderer/utils/markdown.ts` - Markdown parser with highlighting
+- `src/renderer/components/MarkdownViewer.tsx` - Main viewer component
+- `src/renderer/App.tsx` - Application shell
+- `src/renderer/styles/markdown.css` - GitHub-style markdown CSS
+- `src/renderer/styles/index.css` - Global styles with dark mode
+
+### **Phase 3: File Operations** ✅ COMPLETED (Basic)
+- [x] Implement file opening via dialog
+- [x] Command-line argument parsing for file paths
+- [x] IPC handlers for file reading
+- [x] File path display in UI
+- [x] Error handling for file operations
+
+**Features Working:**
+- Open markdown files via "Open File" button
+- Command-line usage: `./markdown-viewer file.md`
+- Auto-load file from command-line on startup
+
+### **CI/CD & Build Infrastructure** ✅ COMPLETED
+- [x] Set up GitHub Actions workflows
+- [x] Multi-platform CI (macOS, Windows, Linux)
+- [x] Automated linting and tests on push/PR
+- [x] electron-builder configuration for all platforms
+- [x] Artifact uploads to GitHub Actions
+- [x] Fixed ESLint errors (`any` types → proper TypeScript types)
+- [x] Fixed TypeScript compilation errors
+- [x] Fixed `__dirname` error (removed ES module type)
+- [x] Added application icon (markdown design)
+
+**Build Outputs:**
+- **Windows:** Portable EXE (no installer)
+- **macOS:** DMG and ZIP
+- **Linux:** AppImage, DEB
+
+**Files Created:**
+- `.github/workflows/build.yml` - CI on push/PR
+- `.github/workflows/release.yml` - Manual release workflow
+- `electron-builder.yml` - Packaging configuration
+- `build/icon.png` - Application icon
+
+### **Documentation** ✅ COMPLETED
+- [x] Comprehensive README.md
+- [x] WSL2-GUIDE.md for running in WSL2
+- [x] Helper scripts (markdown-viewer.sh, markdown-viewer.bat)
+- [x] Testing infrastructure setup
+
+**Current Status:**
+- ✅ All CI builds passing
+- ✅ Application works on Windows 11
+- ✅ Artifacts available for download
+- ✅ Latest build: https://github.com/phenixcoder/markdown/actions/runs/21657079553
 
 ---
 
-### **Phase 1: Foundation Setup** 🏗️
-**Version:** 0.1.0-alpha.1  
-**Timeline:** 2 hours  
-**Priority:** HIGH
+## 🎯 Next Development Phases
 
-#### Tasks
-- [ ] Initialize Vite + Electron + React + TypeScript project
-- [ ] Install core dependencies (React, Electron, marked, etc.)
+### **Phase 3: File Operations** (PARTIAL - Continue Here)
 - [ ] Configure TypeScript (3 configs: main, renderer, node)
 - [ ] Set up ESLint + Prettier with recommended configs
 - [ ] Configure TailwindCSS with custom theme
@@ -115,7 +190,41 @@ This roadmap outlines the complete rebuild of the markdown viewer from a legacy 
 
 ---
 
-### **Phase 3: File Association** 🔗
+### **Phase 3: File Operations** (PARTIAL - Continue Here)
+**Version:** 0.1.0-beta.1  
+**Timeline:** 3 hours remaining  
+**Priority:** HIGH
+
+#### ✅ Completed Tasks
+- [x] Implement file opening via dialog
+- [x] Command-line argument parsing for file paths
+- [x] IPC handlers for file reading
+- [x] Handle `open-file` event (macOS)
+- [x] Parse command-line arguments on startup
+- [x] Support multiple file formats (.md, .markdown, .txt)
+
+#### 🔲 Remaining Tasks
+- [ ] Configure file associations in electron-builder
+- [ ] Test double-click file opening on all platforms
+- [ ] Implement recent files list (using electron-store)
+- [ ] Add drag & drop file support
+- [ ] File watching for auto-reload on changes (using chokidar)
+- [ ] Show notification when file changes externally
+- [ ] Add "Reload" button in UI
+- [ ] Implement file save functionality (if editing enabled)
+
+#### Configuration Files
+- `electron-builder.yml` - File association config (partial)
+- `build/entitlements.mac.plist` - macOS permissions (needed)
+
+#### Next Steps
+1. Test file associations by installing the app
+2. Add recent files menu
+3. Implement file watching for live reload
+
+---
+
+### **Phase 4: Source View Mode** 👁️
 **Version:** 0.1.0-alpha.3  
 **Timeline:** 3 hours  
 **Priority:** HIGH
