@@ -27,10 +27,7 @@ export default function MarkdownViewer({ content, filePath }: MarkdownViewerProp
         </div>
       )}
       <div className="flex-1 overflow-auto">
-        <div
-          ref={containerRef}
-          className="markdown-body max-w-4xl mx-auto px-8 py-8"
-        />
+        <div ref={containerRef} className="markdown-body max-w-4xl mx-auto px-8 py-8" />
       </div>
     </div>
   )

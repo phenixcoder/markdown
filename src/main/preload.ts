@@ -5,6 +5,9 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 contextBridge.exposeInMainWorld('electronAPI', {
   openFile: () => ipcRenderer.invoke('open-file'),
   readFile: (filePath: string) => ipcRenderer.invoke('read-file', filePath),
+  setWindowTitle: (title: string) => ipcRenderer.send('set-window-title', title),
+  getAppInfo: () => ipcRenderer.invoke('get-app-info'),
+  openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
   on: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => {
     ipcRenderer.on(channel, callback)
   },
