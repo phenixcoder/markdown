@@ -16,14 +16,14 @@ mac:
   target:
     - dmg
     - zip
-  icon: build/icon.icns
+  # icon: build/icon.icns
   artifactName: ${productName}-${version}.${ext}
 
 win:
   target:
     - nsis
     - portable
-  icon: build/icon.ico
+  # icon: build/icon.ico
   artifactName: ${productName}-Setup-${version}.${ext}
 
 linux:
@@ -32,7 +32,7 @@ linux:
     - AppImage
     - deb
     - rpm
-  icon: build/icon.png
+  # icon: build/icon.png
   artifactName: ${productName}-${version}.${ext}
 
 nsis:
@@ -45,12 +45,12 @@ fileAssociations:
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/markdown-icon.ico
+    # icon: build/markdown-icon.ico
   - ext: markdown
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/markdown-icon.ico
+    # icon: build/markdown-icon.ico
 
 publish:
   provider: github
