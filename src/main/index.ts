@@ -10,7 +10,8 @@ process.env.VITE_PUBLIC = app.isPackaged
 
 let win: BrowserWindow | null
 let initialFilePath: string | null = null
-let initialFilePayload: FileOpenResult | null = null
+const windowPayloads = new Map<number, FileOpenResult>()
+const windowHasContent = new Map<number, boolean>()
 const REPO_URL = 'https://github.com/phenixcoder/markdown'
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
@@ -124,10 +125,17 @@ function createAppMenu() {
             if (!result) {
               return
             }
-            if (win) {
-              win.webContents.send('open-file-from-menu', result)
+            const targetWindow = win
+            const shouldOpenNewWindow =
+              targetWindow && windowHasContent.get(targetWindow.id) === true
+            if (shouldOpenNewWindow) {
+              createWindow(result)
+              return
+            }
+            if (targetWindow) {
+              targetWindow.webContents.send('open-file-from-menu', result)
             } else {
-              initialFilePayload = result
+              createWindow(result)
             }
           },
         },
@@ -180,8 +188,8 @@ function getFilePathFromArgs(): string | null {
   return null
 }
 
-function createWindow() {
-  win = new BrowserWindow({
+function createWindow(payload?: FileOpenResult) {
+  const newWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
@@ -196,23 +204,42 @@ function createWindow() {
 
   // Load the app
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL)
-    win.webContents.openDevTools()
+    newWindow.loadURL(VITE_DEV_SERVER_URL)
+    newWindow.webContents.openDevTools()
   } else {
-    win.loadFile(path.join(process.env.DIST!, 'index.html'))
+    newWindow.loadFile(path.join(process.env.DIST!, 'index.html'))
   }
 
   // Send initial file path once ready
-  win.webContents.on('did-finish-load', () => {
-    if (initialFilePayload) {
-      win?.webContents.send('open-file-from-menu', initialFilePayload)
-      initialFilePayload = null
+  newWindow.webContents.on('did-finish-load', () => {
+    const queuedPayload = windowPayloads.get(newWindow.id)
+    if (queuedPayload) {
+      newWindow.webContents.send('open-file-from-menu', queuedPayload)
+      windowPayloads.delete(newWindow.id)
       return
     }
     if (initialFilePath) {
-      win?.webContents.send('open-initial-file', initialFilePath)
+      newWindow.webContents.send('open-initial-file', initialFilePath)
     }
   })
+
+  newWindow.on('closed', () => {
+    windowPayloads.delete(newWindow.id)
+    windowHasContent.delete(newWindow.id)
+    if (win?.id === newWindow.id) {
+      win = null
+    }
+  })
+
+  if (!win) {
+    win = newWindow
+  }
+
+  if (payload) {
+    windowPayloads.set(newWindow.id, payload)
+  }
+
+  return newWindow
 }
 
 // IPC Handlers
@@ -257,6 +284,13 @@ ipcMain.handle('open-external', async (_event, url: string) => {
 ipcMain.on('set-window-title', (_event, title: string) => {
   if (win) {
     win.setTitle(title)
+  }
+})
+
+ipcMain.on('set-window-has-content', (event, hasContent: boolean) => {
+  const senderWindow = BrowserWindow.fromWebContents(event.sender)
+  if (senderWindow) {
+    windowHasContent.set(senderWindow.id, hasContent)
   }
 })
 

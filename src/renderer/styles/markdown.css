@@ -106,7 +106,15 @@
 }
 
 .dark .markdown-body pre {
-  background-color: #161b22;
+  background-color: #0f172a;
+}
+
+.markdown-body pre code {
+  color: #111827;
+}
+
+.dark .markdown-body pre code {
+  color: #e5e7eb;
 }
 
 .markdown-body pre code {

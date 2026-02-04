@@ -30,6 +30,7 @@ export interface IElectronAPI {
   openFile: () => Promise<IFilePayload | null>
   readFile: (filePath: string) => Promise<IReadFilePayload>
   setWindowTitle: (title: string) => void
+  setWindowHasContent: (hasContent: boolean) => void
   getAppInfo: () => Promise<IAppInfo>
   openExternal: (url: string) => Promise<void>
   on: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => void

@@ -179,6 +179,10 @@ function App() {
   }, [content, documentTitle])
 
   useEffect(() => {
+    window.electronAPI.setWindowHasContent(Boolean(content))
+  }, [content])
+
+  useEffect(() => {
     const loadAppInfo = async () => {
       try {
         const info = await window.electronAPI.getAppInfo()
@@ -343,42 +347,63 @@ function App() {
         </div>
       </header>
       {showInfo && fileInfo && (
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950">
-          <div className="grid grid-cols-1 gap-2 text-sm text-gray-700 dark:text-gray-200">
-            <div>
-              <span className="font-semibold text-gray-900 dark:text-gray-100">File name:</span>{' '}
-              {fileInfo.fileName}
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          onClick={() => setShowInfo(false)}
+        >
+          <div
+            className="w-full max-w-lg rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-xl"
+            onClick={event => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">File Info</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{fileInfo.fileName}</p>
+              </div>
+              <button
+                onClick={() => setShowInfo(false)}
+                className="inline-flex items-center rounded-md border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                Close
+              </button>
             </div>
-            <div>
-              <span className="font-semibold text-gray-900 dark:text-gray-100">Full path:</span>{' '}
-              <span className="break-all">{fileInfo.filePath}</span>
-            </div>
-            <div>
-              <span className="font-semibold text-gray-900 dark:text-gray-100">File size:</span>{' '}
-              {formatFileSize(fileInfo.size)}
-            </div>
-            <div>
-              <span className="font-semibold text-gray-900 dark:text-gray-100">Created:</span>{' '}
-              {formatDateTime(fileInfo.createdAt)}
-            </div>
-            <div>
-              <span className="font-semibold text-gray-900 dark:text-gray-100">Updated:</span>{' '}
-              {formatDateTime(fileInfo.updatedAt)}
+            <div className="mt-4 grid grid-cols-1 gap-3 text-sm text-gray-700 dark:text-gray-200">
+              <div>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">File name:</span>{' '}
+                {fileInfo.fileName}
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">Full path:</span>{' '}
+                <span className="break-all">{fileInfo.filePath}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">File size:</span>{' '}
+                {formatFileSize(fileInfo.size)}
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">Created:</span>{' '}
+                {formatDateTime(fileInfo.createdAt)}
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">Updated:</span>{' '}
+                {formatDateTime(fileInfo.updatedAt)}
+              </div>
             </div>
             {frontMatterEntries.length > 0 && (
-              <>
-                <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-                {frontMatterEntries.map(entry => (
-                  <div key={`${entry.key}-${entry.value}`} className="space-y-1">
-                    <div className="font-semibold text-gray-900 dark:text-gray-100">
-                      {entry.key}
+              <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="space-y-3">
+                  {frontMatterEntries.map(entry => (
+                    <div key={`${entry.key}-${entry.value}`} className="space-y-1">
+                      <div className="font-semibold text-gray-900 dark:text-gray-100">
+                        {entry.key}
+                      </div>
+                      <div className="font-mono text-xs bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">
+                        {entry.value || '-'}
+                      </div>
                     </div>
-                    <div className="font-mono text-xs bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">
-                      {entry.value || '-'}
-                    </div>
-                  </div>
-                ))}
-              </>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -432,7 +457,11 @@ function App() {
         </div>
       )}
       <main className="flex-1 overflow-hidden">
-        <MarkdownViewer content={content} filePath={filePath || undefined} />
+        <MarkdownViewer
+          content={content}
+          filePath={filePath || undefined}
+          isDarkMode={isDarkMode}
+        />
       </main>
     </div>
   )
