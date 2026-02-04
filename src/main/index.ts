@@ -139,6 +139,14 @@ function createAppMenu() {
             }
           },
         },
+        {
+          label: 'Close',
+          accelerator: 'CmdOrCtrl+W',
+          click: () => {
+            const focusedWindow = BrowserWindow.getFocusedWindow()
+            focusedWindow?.webContents.send('close-document')
+          },
+        },
         { type: 'separator' },
         ...(process.platform === 'darwin'
           ? ([] as Electron.MenuItemConstructorOptions[])
@@ -281,9 +289,10 @@ ipcMain.handle('open-external', async (_event, url: string) => {
   }
 })
 
-ipcMain.on('set-window-title', (_event, title: string) => {
-  if (win) {
-    win.setTitle(title)
+ipcMain.on('set-window-title', (event, title: string) => {
+  const senderWindow = BrowserWindow.fromWebContents(event.sender)
+  if (senderWindow) {
+    senderWindow.setTitle(title)
   }
 })
 

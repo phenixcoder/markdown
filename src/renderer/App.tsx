@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import type { IpcRendererEvent } from 'electron'
 import MarkdownViewer from './components/MarkdownViewer'
-import { FileText, Moon, Sun, Info } from 'lucide-react'
+import { Moon, Sun, Info } from 'lucide-react'
+import appIcon from '../../icon.png'
 import './styles/markdown.css'
 
 interface FrontMatterEntry {
@@ -225,14 +226,25 @@ function App() {
       setShowAbout(true)
     }
 
+    const closeHandler = () => {
+      setContent('')
+      setFilePath(null)
+      setFileInfo(null)
+      setShowInfo(false)
+      setShowAbout(false)
+      setError(null)
+    }
+
     window.electronAPI.on('open-initial-file', handler)
     window.electronAPI.on('open-file-from-menu', menuHandler)
     window.electronAPI.on('show-about', aboutHandler)
+    window.electronAPI.on('close-document', closeHandler)
 
     return () => {
       window.electronAPI.off('open-initial-file', handler)
       window.electronAPI.off('open-file-from-menu', menuHandler)
       window.electronAPI.off('show-about', aboutHandler)
+      window.electronAPI.off('close-document', closeHandler)
     }
   }, [])
 
@@ -295,7 +307,11 @@ function App() {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
         <div className="text-center max-w-md">
-          <FileText className="w-24 h-24 mx-auto mb-6 text-gray-400" />
+          <img
+            src={appIcon}
+            alt="Markdown Viewer"
+            className="w-24 h-24 mx-auto mb-6 rounded-2xl shadow-sm"
+          />
           <h1 className="text-3xl font-bold mb-4">Markdown Viewer</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Open a markdown file from the File menu to get started
