@@ -37,6 +37,26 @@ npm run dev
 
 ### Usage
 
+#### Running in WSL2 (Windows Subsystem for Linux)
+
+Since this is an Electron app running in WSL2, you have two options:
+
+**Option 1: Access via Browser** (Recommended for WSL2)
+```bash
+# Start the dev server
+npm run dev
+
+# Open in Windows browser: http://localhost:5173
+# Note: Electron GUI won't show in WSL2, but Vite dev server works
+```
+
+**Option 2: Run from Windows**
+```bash
+# From Windows PowerShell/CMD, navigate to the WSL path:
+cd \\wsl$\Ubuntu\home\balwant\kitchen-sink\phenixcoder\markdown
+npm run dev
+```
+
 #### Open a file via dialog:
 ```bash
 npm run dev
