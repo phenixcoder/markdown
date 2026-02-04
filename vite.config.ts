@@ -12,6 +12,11 @@ export default defineConfig({
       {
         // Main process entry file
         entry: 'src/main/index.ts',
+        onstart(options) {
+          const openFile = process.env.ELECTRON_OPEN_FILE
+          const argv = openFile ? ['.', '--no-sandbox', openFile] : ['.', '--no-sandbox']
+          options.startup(argv)
+        },
       },
       {
         // Preload script

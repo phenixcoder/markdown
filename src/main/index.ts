@@ -13,11 +13,30 @@ let initialFilePath: string | null = null
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 
+app.disableHardwareAcceleration()
+app.commandLine.appendSwitch('disable-gpu')
+
+process.on('uncaughtException', error => {
+  console.error('Main process uncaught exception:', error)
+})
+
+process.on('unhandledRejection', reason => {
+  console.error('Main process unhandled rejection:', reason)
+})
+
+app.on('render-process-gone', (_event, _webContents, details) => {
+  console.error('Renderer process gone:', details)
+})
+
+app.on('child-process-gone', (_event, details) => {
+  console.error('Child process gone:', details)
+})
+
 // Get file path from command line arguments
 function getFilePathFromArgs(): string | null {
   const args = process.argv.slice(app.isPackaged ? 1 : 2)
   const filePath = args.find(arg => !arg.startsWith('-') && /\.(md|markdown|txt)$/i.test(arg))
-  
+
   if (filePath && fs.existsSync(filePath)) {
     return path.resolve(filePath)
   }

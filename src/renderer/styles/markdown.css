@@ -1,9 +1,15 @@
 /* GitHub-style Markdown CSS */
 .markdown-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   word-wrap: break-word;
+  color: #111827;
+}
+
+.dark .markdown-body {
+  color: #e5e7eb;
 }
 
 .markdown-body h1,
@@ -78,7 +84,8 @@
 .markdown-body code {
   background-color: #f3f4f6;
   border-radius: 3px;
-  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-family:
+    'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   font-size: 85%;
   margin: 0;
   padding: 0.2em 0.4em;
@@ -186,6 +193,6 @@
   background-color: #374151;
 }
 
-.markdown-body input[type="checkbox"] {
+.markdown-body input[type='checkbox'] {
   margin-right: 0.5em;
 }

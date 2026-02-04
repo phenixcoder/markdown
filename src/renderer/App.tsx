@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { IpcRendererEvent } from 'electron'
 import MarkdownViewer from './components/MarkdownViewer'
-import { FileText, FolderOpen } from 'lucide-react'
+import { FileText, FolderOpen, Moon, Sun } from 'lucide-react'
 import './styles/markdown.css'
 
 function App() {
@@ -9,6 +9,39 @@ function App() {
   const [filePath, setFilePath] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [systemPrefersDark, setSystemPrefersDark] = useState(false)
+  const [themePreference, setThemePreference] = useState<'system' | 'light' | 'dark'>('system')
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    setSystemPrefersDark(mediaQuery.matches)
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setSystemPrefersDark(event.matches)
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [])
+
+  const isDarkMode = themePreference === 'system' ? systemPrefersDark : themePreference === 'dark'
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode)
+    document.documentElement.classList.toggle('light', !isDarkMode)
+  }, [isDarkMode])
+
+  const toggleTheme = () => {
+    setThemePreference(prev => {
+      if (prev === 'system') {
+        return systemPrefersDark ? 'light' : 'dark'
+      }
+      return prev === 'dark' ? 'light' : 'dark'
+    })
+  }
 
   // Handle initial file opening from command line
   useEffect(() => {
@@ -18,7 +51,7 @@ function App() {
         await loadFile(initialFilePath)
       }
     }
-    
+
     window.electronAPI.on('open-initial-file', handler)
 
     return () => {
@@ -109,13 +142,22 @@ function App() {
           <p className="text-gray-600 dark:text-gray-400 mb-8">
             Open a markdown file to get started
           </p>
-          <button
-            onClick={handleOpenFile}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-          >
-            <FolderOpen className="w-5 h-5" />
-            Open File
-          </button>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={handleOpenFile}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            >
+              <FolderOpen className="w-5 h-5" />
+              Open File
+            </button>
+            <button
+              onClick={toggleTheme}
+              className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-border bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+          </div>
           <div className="mt-8 text-sm text-gray-500">
             <p>Or drag & drop a file here</p>
             <p className="mt-2">Supports .md, .markdown, .txt files</p>
@@ -129,13 +171,22 @@ function App() {
     <div className="h-screen flex flex-col bg-background text-foreground">
       <header className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-lg font-semibold">Markdown Viewer</h1>
-        <button
-          onClick={handleOpenFile}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
-        >
-          <FolderOpen className="w-4 h-4" />
-          Open File
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-border bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={handleOpenFile}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+          >
+            <FolderOpen className="w-4 h-4" />
+            Open File
+          </button>
+        </div>
       </header>
       <main className="flex-1 overflow-hidden">
         <MarkdownViewer content={content} filePath={filePath || undefined} />
