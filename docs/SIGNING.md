@@ -88,6 +88,11 @@ If you want GPG signing:
 - `LINUX_GPG_PRIVATE_KEY` (ASCII-armored GPG private key)
 - `LINUX_GPG_PASSPHRASE` (key passphrase)
 
+### Notes
+
+- Import the GPG key in CI before running `electron-builder`.
+- Some targets (DEB/RPM) can be signed; AppImage signing is optional.
+
 ## CI Integration Notes
 
 - Signing is driven by `electron-builder` environment variables.
