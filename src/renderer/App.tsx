@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { IpcRendererEvent } from 'electron'
 import MarkdownViewer from './components/MarkdownViewer'
-import { Moon, Sun, Info } from 'lucide-react'
+import { Moon, Sun, Info, ListTree } from 'lucide-react'
 import appIcon from '../../icon.png'
 import './styles/markdown.css'
 
@@ -31,6 +31,12 @@ interface AppInfo {
   iconDataUrl: string | null
 }
 
+interface TocItem {
+  id: string
+  text: string
+  level: number
+}
+
 function App() {
   const [content, setContent] = useState<string>('')
   const [filePath, setFilePath] = useState<string | null>(null)
@@ -40,6 +46,9 @@ function App() {
   const [showInfo, setShowInfo] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null)
+  const [showToc, setShowToc] = useState(true)
+  const [tocItems, setTocItems] = useState<TocItem[]>([])
+  const [activeTocId, setActiveTocId] = useState<string | null>(null)
   const [systemPrefersDark, setSystemPrefersDark] = useState(false)
   const [themePreference, setThemePreference] = useState<'system' | 'light' | 'dark'>('system')
 
@@ -64,6 +73,18 @@ function App() {
     document.documentElement.classList.toggle('dark', isDarkMode)
     document.documentElement.classList.toggle('light', !isDarkMode)
   }, [isDarkMode])
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1024px)')
+    const handleChange = (event: MediaQueryListEvent) => {
+      setShowToc(!event.matches)
+    }
+    setShowToc(!mediaQuery.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [])
 
   const toggleTheme = () => {
     setThemePreference(prev => {
@@ -173,6 +194,52 @@ function App() {
 
   const frontMatterEntries = extractFrontMatter(content)
   const documentTitle = resolveTitle(content, filePath)
+
+  useEffect(() => {
+    if (!content) {
+      setTocItems([])
+      setActiveTocId(null)
+    }
+  }, [content])
+
+  useEffect(() => {
+    if (!tocItems.length) {
+      setActiveTocId(null)
+      return
+    }
+
+    const scrollContainer = document.querySelector<HTMLDivElement>('[data-scroll-container="true"]')
+    const headings = tocItems
+      .map(item => document.getElementById(item.id))
+      .filter((element): element is HTMLElement => Boolean(element))
+
+    if (!scrollContainer || headings.length === 0) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const visibleEntries = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => (a.boundingClientRect.top > b.boundingClientRect.top ? 1 : -1))
+        if (visibleEntries.length > 0) {
+          const id = (visibleEntries[0].target as HTMLElement).id
+          setActiveTocId(id)
+        }
+      },
+      {
+        root: scrollContainer,
+        rootMargin: '-80px 0px -70% 0px',
+        threshold: [0, 1],
+      }
+    )
+
+    headings.forEach(heading => observer.observe(heading))
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [tocItems])
 
   useEffect(() => {
     const title = content ? documentTitle : 'Markdown Viewer'
@@ -347,6 +414,13 @@ function App() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setShowToc(prev => !prev)}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-border bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label={showToc ? 'Hide table of contents' : 'Show table of contents'}
+          >
+            <ListTree className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => setShowInfo(prev => !prev)}
             className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-border bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Toggle file info"
@@ -473,11 +547,67 @@ function App() {
         </div>
       )}
       <main className="flex-1 overflow-hidden">
-        <MarkdownViewer
-          content={content}
-          filePath={filePath || undefined}
-          isDarkMode={isDarkMode}
-        />
+        <div className="flex h-full">
+          {showToc && (
+            <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+              <div className="h-full overflow-y-auto px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Table of Contents
+                </p>
+                {tocItems.length === 0 ? (
+                  <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                    No headings found.
+                  </p>
+                ) : (
+                  <ul className="mt-3 space-y-1">
+                    {tocItems.map(item => {
+                      const isActive = activeTocId === item.id
+                      return (
+                        <li key={item.id}>
+                          <button
+                            onClick={() => {
+                              const target = document.getElementById(item.id)
+                              const container = document.querySelector<HTMLDivElement>(
+                                '[data-scroll-container="true"]'
+                              )
+                              const header = document.querySelector('header')
+                              if (target && container) {
+                                const headerOffset = header
+                                  ? Math.round(header.getBoundingClientRect().height)
+                                  : 0
+                                const offsetTop = target.offsetTop - headerOffset - 16
+                                container.scrollTo({
+                                  top: Math.max(offsetTop, 0),
+                                  behavior: 'smooth',
+                                })
+                              }
+                            }}
+                            className={`w-full rounded-md px-2 py-1 text-left text-sm transition-colors ${
+                              isActive
+                                ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-200'
+                                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900'
+                            }`}
+                            style={{ paddingLeft: `${Math.min(item.level - 1, 5) * 12 + 8}px` }}
+                          >
+                            {item.text || 'Untitled'}
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            </aside>
+          )}
+          <div className="flex-1">
+            <MarkdownViewer
+              content={content}
+              filePath={filePath || undefined}
+              isDarkMode={isDarkMode}
+              onTocChange={setTocItems}
+            />
+          </div>
+        </div>
       </main>
     </div>
   )
