@@ -48,54 +48,43 @@ fileAssociations:
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: markdown
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: mdown
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: mkd
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: mkdn
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: mdwn
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: mdx
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: mdtext
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: rmd
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: qmd
     name: Markdown Document
     description: Markdown Document
     role: Editor
-    icon: build/icon
   - ext: txt
     name: Text Document
     description: Text Document
     role: Editor
-    icon: build/icon
