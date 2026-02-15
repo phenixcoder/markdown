@@ -1,6 +1,6 @@
 {
   "name": "markdown-viewer",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Modern Electron-based markdown viewer with React and TypeScript",
   "main": "dist-electron/index.js",
   "author": "Balwant Singh <phenixcoder@gmail.com>",
