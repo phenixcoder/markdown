@@ -43,8 +43,14 @@ const stripHtml = (value: string): string => value.replace(/<[^>]*>/g, '')
 const createRenderer = (toc?: TocItem[]) => {
   const renderer = new marked.Renderer()
   const slugger = createSlugger()
+  let mermaidBlockId = 0
 
   renderer.code = function (code: string, language: string | undefined) {
+    if (language === 'mermaid') {
+      const id = `mermaid-${mermaidBlockId++}`
+      return `<div class="mermaid" data-mermaid-id="${id}">${code}</div>`
+    }
+
     if (language && hljs.getLanguage(language)) {
       try {
         const highlighted = hljs.highlight(code, { language }).value

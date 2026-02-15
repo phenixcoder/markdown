@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { IpcRendererEvent } from 'electron'
 import MarkdownViewer from './components/MarkdownViewer'
 import { Moon, Sun, Info, ListTree } from 'lucide-react'
@@ -263,7 +263,51 @@ function App() {
     loadAppInfo()
   }, [])
 
-  // Handle initial file opening from command line
+  const loadFile = useCallback(async (path: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const result = await window.electronAPI.readFile(path)
+      setContent(result.content)
+      setFileInfo(result.fileInfo)
+      setFilePath(path)
+    } catch (err) {
+      setError('Failed to load file')
+      console.error('Error loading file:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      const files = e.dataTransfer?.files
+      if (files && files.length > 0) {
+        const file = files[0]
+        if (/\.(md|markdown|txt)$/i.test(file.name)) {
+          const filePath = window.electronAPI.getPathForFile(file)
+          loadFile(filePath)
+        }
+      }
+    }
+
+    document.addEventListener('dragover', handleDragOver)
+    document.addEventListener('drop', handleDrop)
+
+    return () => {
+      document.removeEventListener('dragover', handleDragOver)
+      document.removeEventListener('drop', handleDrop)
+    }
+  }, [loadFile])
+
   useEffect(() => {
     const handler = async (_event: IpcRendererEvent, ...args: unknown[]) => {
       const initialFilePath = args[0]
@@ -313,23 +357,7 @@ function App() {
       window.electronAPI.off('show-about', aboutHandler)
       window.electronAPI.off('close-document', closeHandler)
     }
-  }, [])
-
-  const loadFile = async (path: string) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const result = await window.electronAPI.readFile(path)
-      setContent(result.content)
-      setFileInfo(result.fileInfo)
-      setFilePath(path)
-    } catch (err) {
-      setError('Failed to load file')
-      console.error('Error loading file:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [loadFile])
 
   if (loading) {
     return (

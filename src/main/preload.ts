@@ -1,7 +1,5 @@
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
+import { contextBridge, ipcRenderer, IpcRendererEvent, webUtils } from 'electron'
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
   openFile: () => ipcRenderer.invoke('open-file'),
   readFile: (filePath: string) => ipcRenderer.invoke('read-file', filePath),
@@ -10,6 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.send('set-window-has-content', hasContent),
   getAppInfo: () => ipcRenderer.invoke('get-app-info'),
   openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
+  getPathForFile: (file: File) => webUtils.getPathForFile(file),
   on: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => {
     ipcRenderer.on(channel, callback)
   },

@@ -33,6 +33,7 @@ export interface IElectronAPI {
   setWindowHasContent: (hasContent: boolean) => void
   getAppInfo: () => Promise<IAppInfo>
   openExternal: (url: string) => Promise<void>
+  getPathForFile: (file: File) => string
   on: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => void
   off: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => void
 }
