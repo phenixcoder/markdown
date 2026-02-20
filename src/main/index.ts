@@ -14,6 +14,51 @@ const windowPayloads = new Map<number, FileOpenResult>()
 const windowHasContent = new Map<number, boolean>()
 const REPO_URL = 'https://github.com/phenixcoder/markdown'
 
+// Recent files storage
+const MAX_RECENT_FILES = 20
+const recentFilesPath = path.join(app.getPath('userData'), 'recent-files.json')
+
+interface RecentFile {
+  filePath: string
+  fileName: string
+  openedAt: string
+}
+
+function loadRecentFiles(): RecentFile[] {
+  try {
+    if (fs.existsSync(recentFilesPath)) {
+      const data = fs.readFileSync(recentFilesPath, 'utf-8')
+      return JSON.parse(data)
+    }
+  } catch (error) {
+    console.error('Error loading recent files:', error)
+  }
+  return []
+}
+
+function saveRecentFiles(files: RecentFile[]): void {
+  try {
+    fs.writeFileSync(recentFilesPath, JSON.stringify(files, null, 2))
+  } catch (error) {
+    console.error('Error saving recent files:', error)
+  }
+}
+
+function addToRecentFiles(filePath: string): void {
+  const files = loadRecentFiles()
+  const fileName = path.basename(filePath)
+  const newEntry: RecentFile = {
+    filePath,
+    fileName,
+    openedAt: new Date().toISOString(),
+  }
+
+  const filtered = files.filter(f => f.filePath !== filePath)
+  filtered.unshift(newEntry)
+  const trimmed = filtered.slice(0, MAX_RECENT_FILES)
+  saveRecentFiles(trimmed)
+}
+
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 
 app.setName('Markdown Viewer')
@@ -255,6 +300,7 @@ ipcMain.handle('open-file', async () => openFileFromDialog())
 
 ipcMain.handle('read-file', async (_event, filePath: string) => {
   try {
+    addToRecentFiles(filePath)
     return {
       content: fs.readFileSync(filePath, 'utf-8'),
       fileInfo: buildFileInfo(filePath),
@@ -303,6 +349,22 @@ ipcMain.on('set-window-has-content', (event, hasContent: boolean) => {
   }
 })
 
+ipcMain.handle('get-recent-files', () => {
+  return loadRecentFiles()
+})
+
+ipcMain.handle('clear-recent-files', () => {
+  saveRecentFiles([])
+  return []
+})
+
+ipcMain.handle('remove-recent-file', (_event, filePath: string) => {
+  const files = loadRecentFiles()
+  const filtered = files.filter(f => f.filePath !== filePath)
+  saveRecentFiles(filtered)
+  return filtered
+})
+
 // App lifecycle
 app.whenReady().then(() => {
   // Check for file path in command line args
@@ -324,12 +386,24 @@ app.on('activate', () => {
   }
 })
 
-// Handle file opening from system (double-click)
 app.on('open-file', (event, filePath) => {
   event.preventDefault()
-  if (win) {
-    win.webContents.send('open-initial-file', filePath)
-  } else {
+
+  if (!app.isReady()) {
     initialFilePath = filePath
+    return
+  }
+
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8')
+    const payload: FileOpenResult = {
+      filePath,
+      content,
+      fileInfo: buildFileInfo(filePath),
+    }
+    addToRecentFiles(filePath)
+    createWindow(payload)
+  } catch (error) {
+    console.error('Error opening file from system:', error)
   }
 })

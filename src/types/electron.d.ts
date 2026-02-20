@@ -26,6 +26,12 @@ export interface IAppInfo {
   iconDataUrl: string | null
 }
 
+export interface IRecentFile {
+  filePath: string
+  fileName: string
+  openedAt: string
+}
+
 export interface IElectronAPI {
   openFile: () => Promise<IFilePayload | null>
   readFile: (filePath: string) => Promise<IReadFilePayload>
@@ -34,6 +40,9 @@ export interface IElectronAPI {
   getAppInfo: () => Promise<IAppInfo>
   openExternal: (url: string) => Promise<void>
   getPathForFile: (file: File) => string
+  getRecentFiles: () => Promise<IRecentFile[]>
+  clearRecentFiles: () => Promise<IRecentFile[]>
+  removeRecentFile: (filePath: string) => Promise<IRecentFile[]>
   on: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => void
   off: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => void
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { IpcRendererEvent } from 'electron'
 import MarkdownViewer from './components/MarkdownViewer'
-import { Moon, Sun, Info, ListTree } from 'lucide-react'
+import { Moon, Sun, Info, ListTree, FileText, Clock, ChevronRight, X } from 'lucide-react'
 import appIcon from '../../icon.png'
 import './styles/markdown.css'
 
@@ -37,6 +37,12 @@ interface TocItem {
   level: number
 }
 
+interface RecentFile {
+  filePath: string
+  fileName: string
+  openedAt: string
+}
+
 function App() {
   const [content, setContent] = useState<string>('')
   const [filePath, setFilePath] = useState<string | null>(null)
@@ -51,6 +57,8 @@ function App() {
   const [activeTocId, setActiveTocId] = useState<string | null>(null)
   const [systemPrefersDark, setSystemPrefersDark] = useState(false)
   const [themePreference, setThemePreference] = useState<'system' | 'light' | 'dark'>('system')
+  const [recentFiles, setRecentFiles] = useState<RecentFile[]>([])
+  const [showAllRecents, setShowAllRecents] = useState(false)
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -263,6 +271,23 @@ function App() {
     loadAppInfo()
   }, [])
 
+  // Load recent files on mount and when returning to home screen
+  useEffect(() => {
+    const loadRecentFiles = async () => {
+      try {
+        const files = await window.electronAPI.getRecentFiles()
+        setRecentFiles(files)
+      } catch (err) {
+        console.error('Error loading recent files:', err)
+      }
+    }
+
+    if (!content) {
+      loadRecentFiles()
+      setShowAllRecents(false)
+    }
+  }, [content])
+
   const loadFile = useCallback(async (path: string) => {
     setLoading(true)
     setError(null)
@@ -398,10 +423,41 @@ function App() {
     )
   }
 
+  const formatRelativeTime = (isoString: string): string => {
+    const date = new Date(isoString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    if (diffDays < 7) return `${diffDays}d ago`
+    return date.toLocaleDateString()
+  }
+
+  const handleOpenRecentFile = async (path: string) => {
+    await loadFile(path)
+  }
+
+  const handleRemoveRecentFile = async (path: string, event: React.MouseEvent) => {
+    event.stopPropagation()
+    try {
+      await window.electronAPI.removeRecentFile(path)
+      setRecentFiles(prev => prev.filter(f => f.filePath !== path))
+    } catch (err) {
+      console.error('Error removing recent file:', err)
+    }
+  }
+
+  const displayedRecents = showAllRecents ? recentFiles : recentFiles.slice(0, 5)
+
   if (!content) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
-        <div className="text-center max-w-md">
+        <div className="text-center max-w-lg w-full px-4">
           <img
             src={appIcon}
             alt="Markdown Viewer"
@@ -418,6 +474,63 @@ function App() {
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
+
+          {recentFiles.length > 0 && (
+            <div className="mt-8 text-left">
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="w-4 h-4 text-gray-500" />
+                <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  Recent Files
+                </h2>
+              </div>
+              <ul className="space-y-1">
+                {displayedRecents.map(file => (
+                  <li key={file.filePath}>
+                    <button
+                      onClick={() => handleOpenRecentFile(file.filePath)}
+                      className="w-full group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                    >
+                      <FileText className="w-4 h-4 text-gray-400 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                          {file.fileName}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {file.filePath}
+                        </p>
+                      </div>
+                      <span className="text-xs text-gray-400 shrink-0">
+                        {formatRelativeTime(file.openedAt)}
+                      </span>
+                      <button
+                        onClick={e => handleRemoveRecentFile(file.filePath, e)}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-opacity"
+                        aria-label="Remove from recent files"
+                      >
+                        <X className="w-3 h-3 text-gray-500" />
+                      </button>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {recentFiles.length > 5 && (
+                <button
+                  onClick={() => setShowAllRecents(prev => !prev)}
+                  className="mt-2 flex items-center gap-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  {showAllRecents ? (
+                    <>Show Less</>
+                  ) : (
+                    <>
+                      See More
+                      <ChevronRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="mt-8 text-sm text-gray-500">
             <p>Or drag & drop a file here</p>
             <p className="mt-2">Supports .md, .markdown, .txt files</p>

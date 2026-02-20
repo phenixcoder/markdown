@@ -9,6 +9,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAppInfo: () => ipcRenderer.invoke('get-app-info'),
   openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
   getPathForFile: (file: File) => webUtils.getPathForFile(file),
+  getRecentFiles: () => ipcRenderer.invoke('get-recent-files'),
+  clearRecentFiles: () => ipcRenderer.invoke('clear-recent-files'),
+  removeRecentFile: (filePath: string) => ipcRenderer.invoke('remove-recent-file', filePath),
   on: (channel: string, callback: (event: IpcRendererEvent, ...args: unknown[]) => void) => {
     ipcRenderer.on(channel, callback)
   },
