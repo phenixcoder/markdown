@@ -29,12 +29,17 @@ jobs:
 
       - name: Update package.json version
         run: |
-          npm version ${{ github.event.inputs.version }} --no-git-tag-version
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add package.json
-          git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
-          git push
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if [ "$CURRENT_VERSION" != "${{ github.event.inputs.version }}" ]; then
+            npm version ${{ github.event.inputs.version }} --no-git-tag-version
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git add package.json package-lock.json
+            git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
+            git push
+          else
+            echo "Version already at ${{ github.event.inputs.version }}, skipping bump"
+          fi
 
       - name: Create Release
         id: create_release
