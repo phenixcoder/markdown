@@ -193,6 +193,17 @@ function createAppMenu() {
           },
         },
         { type: 'separator' },
+        {
+          label: 'Print...',
+          accelerator: 'CmdOrCtrl+P',
+          click: () => {
+            const focusedWindow = BrowserWindow.getFocusedWindow()
+            if (focusedWindow) {
+              focusedWindow.webContents.print({ silent: false, printBackground: true })
+            }
+          },
+        },
+        { type: 'separator' },
         ...(process.platform === 'darwin'
           ? ([] as Electron.MenuItemConstructorOptions[])
           : [{ role: 'quit' }]),
