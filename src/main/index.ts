@@ -210,19 +210,33 @@ function createAppMenu() {
       ],
     },
     {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'delete' },
+        { type: 'separator' },
+        { role: 'selectAll' },
+      ] as Electron.MenuItemConstructorOptions[],
+    },
+    {
       label: 'View',
       submenu: [
         { role: 'reload' },
         ...(process.env.VITE_DEV_SERVER_URL
-          ? [{ role: 'toggledevtools' }]
+          ? ([{ role: 'toggleDevTools' }] as Electron.MenuItemConstructorOptions[])
           : ([] as Electron.MenuItemConstructorOptions[])),
         { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
         { type: 'separator' },
         { role: 'togglefullscreen' },
-      ],
+      ] as Electron.MenuItemConstructorOptions[],
     },
     {
       label: 'Help',
@@ -233,11 +247,11 @@ function createAppMenu() {
             win?.webContents.send('show-about')
           },
         },
-      ],
+      ] as Electron.MenuItemConstructorOptions[],
     },
   ]
 
-  const menu = Menu.buildFromTemplate(template)
+  const menu = Menu.buildFromTemplate(template as Electron.MenuItemConstructorOptions[])
   Menu.setApplicationMenu(menu)
 }
 
